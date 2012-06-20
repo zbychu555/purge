@@ -1,10 +1,11 @@
 # cat=basic/enable; type=boolean; label=Send PURGE request when TYPO3 clears cache.
 enablePurgeCalls = 1
 
+# cat=basic/enable; type=boolean; label=Disable PURGE requests during l10nmgr import processes
+disableL10nmgrPurgeRequests = 0
+
 # cat=RealURL/; type=string; label=Override domain: Normally the RealURL finder will return one URL for all domains found in the RealURL configuration. With this option, you can override the domains. Specify domains comma separated, and only URLs for these domains will be cleared. The domains does not have to be in the RealURL conf.
 overrideDomains =
 
 # cat=RealURL/; type=string; label=Expand page ids: Comma separated key value list with src>dest where one uid can be expanded to multiple other uids. Asterisk can be used to mask all source uids.
 expainsPids =
-
-
