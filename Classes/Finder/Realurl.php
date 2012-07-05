@@ -2,19 +2,19 @@
 
 class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 
-	/**
-	 * @var array
-	 */
+		/**
+		 * @var array
+		 */
 	protected $conf;
 
-	/**
-	 * @var array
-	 */
+		/**
+		 * @var array
+		 */
 	protected $cacheLookupTables=array();
 
-	/**
-	 * @throws Exception
-	 */
+		/**
+		 * @throws Exception
+		 */
 	public function __construct() {
 		$this->conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['purge']);
 
@@ -31,36 +31,63 @@ class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 		}
 	}
 
-	/**
-	 * @param int $uid
-	 * @return array
-	 */
+		/**
+		 * @param int $uid
+		 * @return array
+		 */
 	public function getURLFromPageID($uid) {
 		$urls = array();
 
 		$uidList = $this->expandUid($uid);
 		foreach($this->cacheLookupTables as $tableCfg) {
-
 			list($table,$pageId,$rootPid,$path) = explode(':', $tableCfg);
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, $pageId . ' IN ('. implode(',', $uidList) . ')');
-			if($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-				foreach($this->getDomainsFromRootpageId($row[$rootPid]) as $domain) {
-					$url = array();
-					$url['path'] = $row[$path].'/';
-					if($domain != '_DEFAULT') {
-						$url['domain'] = $domain;
-					}
-					$urls[] = $url;
+			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+				foreach ($this->getDomainsFromRootpageId($row[$rootPid]) as $domain) {
+					$realDomains = $this->getDomainsFromRootpageId($row[$rootPid], FALSE);
+					$urls[] = array(
+						'domain'	=> $domain,
+						'path' 		=> $this->prefixLanguage($row['languageid'], $realDomains, $row[$path] . '/'),
+					);
 				}
 			}
 		}
 		return $urls;
 	}
 
-	/**
-	 * @param $uid
-	 * @return array
-	 */
+		/**
+		 * @param string $language
+		 * @param array $domains
+		 * @param string $path
+		 * @return string
+		 */
+	protected function prefixLanguage($language, array $domains, $path) {
+		$valueMap = $this->getRealUrlValueMap(current($domains));
+		$id2Language = array_flip($valueMap);
+		if (isset($id2Language[$language])) {
+			$path = ltrim($id2Language[$language] . '/' . $path, '/');
+		}
+		return $path;
+	}
+
+		/**
+		 * @param string $domain
+		 * @return array
+		 */
+	protected function getRealUrlValueMap($domain) {
+		$valueMap = array();
+		foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl'][$domain]['preVars'] as $index => $configuration) {
+			if (array_key_exists('GETvar', $configuration) && $configuration['GETvar'] === 'L') {
+				$valueMap = $configuration['valueMap'];
+			}
+		}
+		return $valueMap;
+	}
+
+		/**
+		 * @param $uid
+		 * @return array
+		 */
 	protected function expandUid($uid) {
 		if(!isset($this->conf['expainsPids']) || empty($this->conf['expainsPids'])) {
 			return array(intval($uid));
@@ -78,16 +105,17 @@ class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 		return $uidList;
 	}
 
-	/**
-	 * Given a certain page id, looks through RealURL conf to find all domains with this page as root id.
-	 * The method takes the override_domains Extconf option into account!
-	 *
-	 * @param int $uid
-	 * @return array
-	 */
-	protected function getDomainsFromRootpageId($uid) {
+		/**
+		 * Given a certain page id, looks through RealURL conf to find all domains with this page as root id.
+		 * The method takes the override_domains Extconf option into account!
+		 *
+		 * @param int $uid
+		 * @param bool $enableOverrideDomains
+		 * @return array
+		 */
+	protected function getDomainsFromRootpageId($uid, $enableOverrideDomains=TRUE) {
 		$domains = array();
-		if($this->conf['overrideDomains']) {
+		if($this->conf['overrideDomains'] && $enableOverrideDomains) {
 			return t3lib_div::trimExplode(',',$this->conf['overrideDomains']);
 		}
 
