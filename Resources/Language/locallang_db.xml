@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>database</type>
+		<description>Language labels for database tables/fields belonging to extension 'purge'</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="clearCacheMenu_purgeClearCache">Clear purge cache</label>
+			<label index="schedulerTask.processCacheQueue.name">Cache queue processor</label>
+			<label index="schedulerTask.processCacheQueue.description">Processes cache queue entries of purge extension</label>
+		</languageKey>
+	</data>
+</T3locallang>

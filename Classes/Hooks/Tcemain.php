@@ -9,49 +9,9 @@ class Tx_Purge_Hooks_Tcemain {
 	 */
 	public function clearCacheCmd($params, &$parent) {
 		if ($parent->admin || $parent->BE_USER->getTSConfigVal('options.clearCache.pages')) {
-			switch ($params['cacheCmd']) {
-				case 'pages':
-					t3lib_div::devLog('clearCacheCmd() pages', 'purge');
-					// break left out intentionally
-				case 'all':
-					t3lib_div::devLog('clearCacheCmd() all', 'purge');
-					$cacheMgm = t3lib_div::makeInstance('Tx_Purge_Cachemgr'); /* @var $cacheMgm Tx_Purge_Cachemgr */
-					$config = $this->getConfig();
-
-					if ($this->hasOverrideDomains($config)) {
-						foreach ($this->getOverrideDomains($config) as $domain) {
-							$cacheMgm->clearCacheForUrl('.*', $domain);
-						}
-					} else {
-						$cacheMgm->clearCacheForUrl('.*');
-					}
-
-					break;
-			}
+			$cacheMgm = t3lib_div::makeInstance('Tx_Purge_Cachemgr'); /* @var $cacheMgm Tx_Purge_Cachemgr */
+			$cacheMgm->clearCache($params['cacheCmd']);
 		}
-	}
-
-	/**
-	 * @return array
-	 */
-	protected function getConfig() {
-		return unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['purge']);
-	}
-
-	/**
-	 * @param array $config
-	 * @return bool
-	 */
-	protected function hasOverrideDomains(array $config) {
-		return !empty($config['overrideDomains']);
-	}
-
-	/**
-	 * @param array $config
-	 * @return array
-	 */
-	protected function getOverrideDomains(array $config) {
-		return t3lib_div::trimExplode(',', $config['overrideDomains']);
 	}
 
 	/**

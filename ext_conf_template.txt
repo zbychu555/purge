@@ -4,6 +4,9 @@ enablePurgeCalls = 1
 # cat=basic/enable; type=boolean; label=Disable PURGE requests during l10nmgr import processes
 disableL10nmgrPurgeRequests = 0
 
+# cat=basic/enable; type=boolean; label=Process cache queue asynchronously via scheduler task
+enableAsynchronousProcessing = 0
+
 # cat=RealURL/; type=string; label=Override domain: Normally the RealURL finder will return one URL for all domains found in the RealURL configuration. With this option, you can override the domains. Specify domains comma separated, and only URLs for these domains will be cleared. The domains does not have to be in the RealURL conf.
 overrideDomains =
 
