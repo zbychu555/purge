@@ -18,15 +18,20 @@ class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 	public function __construct() {
 		$this->conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['purge']);
 
-			// default RealUrl
+		// default RealUrl
 		$this->cacheLookupTables = array('tx_realurl_pathcache:page_id:rootpage_id:pagepath');
+
+		if (!$this->conf['forceDefaultCacheLookupTables']) {
 			// advanced RealUrl
-		if (in_array('tx_realurl_cachehistory', array_keys($GLOBALS['TYPO3_DB']->admin_get_tables()))) {
-			$this->cacheLookupTables = array(
-				'tx_realurl_cache:pageid:rootpid:path',
-				'tx_realurl_cachehistory:pageid:rootpid:path'
-			);
-		} elseif (t3lib_extMgm::isLoaded('aoe_realurlpath')) {
+			if (in_array('tx_realurl_cachehistory', array_keys($GLOBALS['TYPO3_DB']->admin_get_tables()))) {
+				$this->cacheLookupTables = array(
+					'tx_realurl_cache:pageid:rootpid:path',
+					'tx_realurl_cachehistory:pageid:rootpid:path'
+				);
+			}
+		}
+
+		if (t3lib_extMgm::isLoaded('aoe_realurlpath')) {
 			throw new Exception('This extension is not compatible with aoe_realurlpath');
 		}
 	}

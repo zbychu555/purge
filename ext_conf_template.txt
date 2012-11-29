@@ -12,3 +12,6 @@ overrideDomains =
 
 # cat=RealURL/; type=string; label=Expand page ids: Comma separated key value list with src>dest where one uid can be expanded to multiple other uids. Asterisk can be used to mask all source uids.
 expainsPids =
+
+# cat=RealURL/; type=boolean; label=Force default cache lookup tables: Set this configuration if you want to force using default cache lookup tables. This could be interesting if you have advanced RealUrl installed but using default page path handling.
+forceDefaultCacheLookupTables = 0
