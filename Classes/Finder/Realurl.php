@@ -45,14 +45,16 @@ class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 
 		$uidList = $this->expandUid($uid);
 		foreach($this->cacheLookupTables as $tableCfg) {
-			list($table,$pageId,$rootPid,$path) = explode(':', $tableCfg);
+			list($table,$pageId,$rootPid,$pathKey) = explode(':', $tableCfg);
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, $pageId . ' IN ('. implode(',', $uidList) . ')');
 			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
 				foreach ($this->getDomainsFromRootpageId($row[$rootPid]) as $domain) {
 					$realDomains = $this->getDomainsFromRootpageId($row[$rootPid], FALSE);
+					$pagePath = $this->prefixLanguage($row['languageid'], $realDomains, $row[$pathKey] . '/');
+					$pagePath = $this->suffixHtml($realDomains, $pagePath);
 					$urls[] = array(
 						'domain'	=> $domain,
-						'path' 		=> $this->prefixLanguage($row['languageid'], $realDomains, $row[$path] . '/'),
+						'path' 		=> $pagePath,
 					);
 				}
 			}
@@ -87,6 +89,27 @@ class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 			}
 		}
 		return $valueMap;
+	}
+
+	protected function suffixHtml(array $domains, $path) {
+		if($this->hasRealUrlPathHtmlSuffix(current($domains))) {
+			$path = rtrim($path, '/').'.html';
+		}
+		return $path;
+	}
+
+	protected function hasRealUrlPathHtmlSuffix($domain) {
+		$hasHtmlSuffix = false;
+
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl'][$domain])) {
+			if (isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl'][$domain]['fileName']['defaultToHTMLsuffixOnPrev'])) {
+				$hasHtmlSuffix = (bool) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl']['_DEFAULT']['fileName']['defaultToHTMLsuffixOnPrev'];
+			}
+		} elseif (isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl']['_DEFAULT']['fileName']['defaultToHTMLsuffixOnPrev'])) {
+			$hasHtmlSuffix = (bool) $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl']['_DEFAULT']['fileName']['defaultToHTMLsuffixOnPrev'];
+		}
+
+		return $hasHtmlSuffix;
 	}
 
 		/**
