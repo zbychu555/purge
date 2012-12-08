@@ -9,6 +9,7 @@ return array(
 	'tx_purge_finder' => $extensionClassesPath . 'Finder.php',
 	'tx_purge_locator' => $extensionClassesPath . 'Locator.php',
 	'tx_purge_finder_realurl' => $extensionClassesPath . 'Finder/Realurl.php',
+	'tx_purge_finder_pageid' => $extensionClassesPath . 'Finder/PageId.php',
 	'tx_purge_hooks_tcemain' => $extensionClassesPath . 'Hooks/Tcemain.php',
 	'user_tx_purge_hooks_l10nmgr' => $extensionClassesPath . 'Hooks/class.user_tx_purge_hooks_l10nmgr.php',
 );

@@ -18,6 +18,7 @@ if (t3lib_extMgm::isLoaded('l10nmgr') && $confArr['disableL10nmgrPurgeRequests']
 if (t3lib_extMgm::isLoaded('realurl')) {
 	$TYPO3_CONF_VARS['EXTCONF']['purge']['finder'][] = 'Tx_Purge_Finder_Realurl';
 }
+$TYPO3_CONF_VARS['EXTCONF']['purge']['finder'][] = 'Tx_Purge_Finder_PageId';
 
 if (TYPO3_MODE == 'BE') {
 	// configure scheduler-tasks
