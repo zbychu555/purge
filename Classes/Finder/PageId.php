@@ -23,7 +23,7 @@ class Tx_Purge_Finder_PageId implements Tx_Purge_Finder, t3lib_Singleton {
 		$uidList = $this->expandUid($pageUid);
 		foreach($uidList as $uid) {
 			$url = array();
-			$url['path'] = 'index.php?id=' . $uid . '.*';
+			$url['path'] = '.*\\\?.*id=' . $uid;
 			$urls[] = $url;
 		}
 		return $urls;
