@@ -57,12 +57,12 @@ class Tx_Purge_Finder_Realurl extends Tx_Purge_Finder_Abstract {
 		return $urls;
 	}
 
-		/**
-		 * @param string $language
-		 * @param array $domains
-		 * @param string $path
-		 * @return string
-		 */
+	/**
+	 * @param string $language
+	 * @param array $domains
+	 * @param string $path
+	 * @return string
+	 */
 	protected function prefixLanguage($language, array $domains, $path) {
 		$valueMap = $this->getRealUrlValueMap(current($domains));
 		$id2Language = array_flip($valueMap);
@@ -72,14 +72,14 @@ class Tx_Purge_Finder_Realurl extends Tx_Purge_Finder_Abstract {
 		return $path;
 	}
 
-		/**
-		 * @param string $domain
-		 * @return array
-		 */
+	/**
+	 * @param string $domain
+	 * @return array
+	 */
 	protected function getRealUrlValueMap($domain) {
 		$valueMap = array();
 		foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl'][$domain]['preVars'] as $index => $configuration) {
-			if (array_key_exists('GETvar', $configuration) && $configuration['GETvar'] === 'L') {
+			if (array_key_exists('GETvar', $configuration) && $configuration['GETvar'] === 'L' && $configuration['valueMap']) {
 				$valueMap = $configuration['valueMap'];
 			}
 		}

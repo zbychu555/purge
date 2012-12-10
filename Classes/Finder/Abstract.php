@@ -16,14 +16,6 @@ abstract class Tx_Purge_Finder_Abstract implements Tx_Purge_Finder, t3lib_Single
 	}
 
 	/**
-	 * Finds url for given page id
-	 *
-	 * @param int $pageUid
-	 * @return array with keys 'url', 'domain'
-	 */
-	abstract public function getURLFromPageID($pageUid);
-
-	/**
 	 * Expand uid to list of uids based on extension configuration
 	 *
 	 * @param $uid
