@@ -1,22 +1,17 @@
 <?php
 
-class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
+class Tx_Purge_Finder_Realurl extends Tx_Purge_Finder_Abstract {
 
-		/**
-		 * @var array
-		 */
-	protected $conf;
-
-		/**
-		 * @var array
-		 */
+	/**
+	 * @var array
+	 */
 	protected $cacheLookupTables=array();
 
-		/**
-		 * @throws Exception
-		 */
+	/**
+	 * @throws Exception
+	 */
 	public function __construct() {
-		$this->conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['purge']);
+		parent::__construct();
 
 		// default RealUrl
 		$this->cacheLookupTables = array('tx_realurl_pathcache:page_id:rootpage_id:pagepath');
@@ -36,15 +31,15 @@ class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 		}
 	}
 
-		/**
-		 * @param int $uid
-		 * @return array
-		 */
+	/**
+	 * @param int $uid
+	 * @return array
+	 */
 	public function getURLFromPageID($uid) {
 		$urls = array();
 
 		$uidList = $this->expandUid($uid);
-		foreach($this->cacheLookupTables as $tableCfg) {
+		foreach ($this->cacheLookupTables as $tableCfg) {
 			list($table,$pageId,$rootPid,$pathKey) = explode(':', $tableCfg);
 			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, $pageId . ' IN ('. implode(',', $uidList) . ')');
 			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
@@ -83,7 +78,7 @@ class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 		 */
 	protected function getRealUrlValueMap($domain) {
 		$valueMap = array();
-		foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl'][$domain]['preVars'] as $index => $configuration) {
+		foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl'][$domain]['preVars'] as $index => $configuration) {
 			if (array_key_exists('GETvar', $configuration) && $configuration['GETvar'] === 'L') {
 				$valueMap = $configuration['valueMap'];
 			}
@@ -92,7 +87,7 @@ class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 	}
 
 	protected function suffixHtml(array $domains, $path) {
-		if($this->hasRealUrlPathHtmlSuffix(current($domains))) {
+		if ($this->hasRealUrlPathHtmlSuffix(current($domains))) {
 			$path = rtrim($path, '/').'.html';
 		}
 		return $path;
@@ -112,39 +107,18 @@ class Tx_Purge_Finder_Realurl implements Tx_Purge_Finder, t3lib_Singleton {
 		return $hasHtmlSuffix;
 	}
 
-		/**
-		 * @param $uid
-		 * @return array
-		 */
-	protected function expandUid($uid) {
-		if(!isset($this->conf['expainsPids']) || empty($this->conf['expainsPids'])) {
-			return array(intval($uid));
-		}
-
-		$expandList = t3lib_div::trimExplode(',', $this->conf['expainsPids']);
-		$uidList = array();
-		$uidList[] = intval($uid);
-		foreach($expandList as $expand) {
-			$matches=array();
-			if (preg_match('/^(' . $uid . '|\*)>(\d+)$/',$expand, $matches)) {
-				$uidList[] = intval($matches[1]);
-			}
-		}
-		return $uidList;
-	}
-
-		/**
-		 * Given a certain page id, looks through RealURL conf to find all domains with this page as root id.
-		 * The method takes the override_domains Extconf option into account!
-		 *
-		 * @param int $uid
-		 * @param bool $enableOverrideDomains
-		 * @return array
-		 */
+	/**
+	 * Given a certain page id, looks through RealURL conf to find all domains with this page as root id.
+	 * The method takes the override_domains Extconf option into account!
+	 *
+	 * @param int $uid
+	 * @param bool $enableOverrideDomains
+	 * @return array
+	 */
 	protected function getDomainsFromRootpageId($uid, $enableOverrideDomains=TRUE) {
 		$domains = array();
 		if($this->conf['overrideDomains'] && $enableOverrideDomains) {
-			return t3lib_div::trimExplode(',',$this->conf['overrideDomains']);
+			return t3lib_div::trimExplode(',', $this->conf['overrideDomains']);
 		}
 
 		foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl'] as $domain=>$conf) {

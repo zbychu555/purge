@@ -8,23 +8,22 @@ class Tx_Purge_Cachemgr {
 	protected $clearQueue = array();
 
 	/**
-	 * @param string $url
+	 * @param string $path
 	 * @param string $domain
-	 * @param string $scheme
 	 * @return void
 	 */
-	public function clearCacheForUrl($url, $domain = "", $scheme = "http://") {
-		t3lib_div::devLog('clearCacheForUrl', 'purge', t3lib_div::SYSLOG_SEVERITY_INFO, array($url));
+	public function clearCacheForUrl($path, $domain = "") {
+		t3lib_div::devLog('clearCacheForUrl', 'purge', t3lib_div::SYSLOG_SEVERITY_INFO, array($path));
 		if ($domain) {
-			if (substr($domain, -1) == '/' || substr($url, 0, 1) == '/') {
-				$path = $scheme . $domain . $url;
+			if (substr($domain, -1) == '/' || substr($path, 0, 1) == '/') {
+				$fullUrl = $domain . $path;
 			} else {
-				$path = $scheme . $domain . '/' . $url;
+				$fullUrl = $domain . '/' . $path;
 			}
 		} else {
-			$path = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST') . '/' . $url;
+			$fullUrl = t3lib_div::getIndpEnv('HTTP_HOST') . '/' . $path;
 		}
-		$this->clearQueue[] = $path;
+		$this->clearQueue[] = $fullUrl;
 		$this->clearQueue = array_unique($this->clearQueue);
 	}
 
@@ -171,7 +170,7 @@ class Tx_Purge_Cachemgr {
 	}
 
 	/**
-	 * @param array $clearQueue
+	 * @param array $paths
 	 */
 	public function addClearQueuePaths($paths) {
 		$this->clearQueue = array_merge($this->clearQueue, $paths);

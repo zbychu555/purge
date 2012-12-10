@@ -23,6 +23,7 @@ class Tx_Purge_Hooks_Tcemain {
 	 */
 	public function clearCacheForListOfUids($params, &$parent) {
 		$locator = t3lib_div::makeInstance('Tx_Purge_Locator');
+		/* @var $cacheMgm Tx_Purge_Cachemgr */
 		$cacheMgm = t3lib_div::makeInstance('Tx_Purge_Cachemgr');
 		t3lib_div::devLog('clearCacheForListOfUids()', 'purge', 0, $params);
 		foreach ($params['pageIdArray'] as $uid) {
