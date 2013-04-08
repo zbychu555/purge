@@ -91,8 +91,8 @@ class Tx_Purge_Cachemgr {
 					$info = curl_getinfo($ch);
 					t3lib_div::devLog('info', 'purge', t3lib_div::SYSLOG_SEVERITY_INFO, $info);
 				}
-				curl_close($ch);
 				curl_multi_remove_handle($mh, $ch);
+				curl_close($ch);
 			}
 
 			curl_multi_close($mh);
