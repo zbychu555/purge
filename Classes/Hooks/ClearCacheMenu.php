@@ -1,5 +1,7 @@
 <?php
 
+require_once(PATH_typo3 . 'interfaces/interface.backend_cacheActionsHook.php');
+
 class Tx_Purge_Hooks_ClearCacheMenu implements backend_cacheActionsHook {
 
 	/**
