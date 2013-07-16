@@ -111,6 +111,8 @@ class Tx_Purge_Cachemgr {
 		curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, 'PURGE');
 		curl_setopt($curlHandle, CURLOPT_HEADER, 0);
 		curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curlHandle, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($curlHandle, CURLOPT_TIMEOUT, 60);
 
 		return $curlHandle;
 	}
