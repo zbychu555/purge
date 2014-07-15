@@ -27,18 +27,14 @@ class Tx_Purge_Repository implements t3lib_Singleton {
 	 */
 	public function getAndRemovePathsInCacheQueue($rowCount = 1000) {
 		$paths = array();
-		$queueEntries = $this->db->exec_SELECTgetRows('uid, path', $this->queueTable, '', '', '', '0,'.$rowCount);
+		$resource = $this->db->exec_SELECTquery('DISTINCT path', $this->queueTable, '', '', '', '0,'.$rowCount);
 
-		if (!empty($queueEntries)) {
-			$deleteEntryIDs = array();
-
-			foreach($queueEntries as $queueEntry) {
-				$deleteEntryIDs[] = $queueEntry['uid'];
-				$paths[] = $queueEntry['path'];
+		if ($resource) {
+			while($row = $this->db->sql_fetch_assoc($resource)) {
+				$paths[] = $this->db->quoteStr($row['path'], $this->queueTable);
 			}
 
-			$paths = array_unique($paths);
-			$this->db->exec_DELETEquery($this->queueTable, 'uid IN('.implode(',', $deleteEntryIDs).')');
+			$this->db->exec_DELETEquery($this->queueTable, 'path IN("'.implode('","', $paths).'")');
 		}
 
 		return $paths;
