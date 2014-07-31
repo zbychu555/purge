@@ -1,11 +1,38 @@
 <?php
+/***************************************************************
+ * Copyright notice
+ *
+ * (c) 2012 AOE GmbH <dev@aoe.com>
+ *  All rights reserved
+ *
+ *  This script is part of the Typo3 project. The Typo3 project is
+ *  free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The GNU General Public License can be found at
+ *  http://www.gnu.org/copyleft/gpl.html.
+ *
+ *  This script is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  This copyright notice MUST APPEAR in all copies of the script!
+ ***************************************************************/
 
 class Tx_Purge_Finder_Realurl extends Tx_Purge_Finder_Abstract {
 
 	/**
 	 * @var array
 	 */
-	protected $cacheLookupTables=array();
+	protected $cacheLookupTables = array();
+
+	/**
+	 * @var t3lib_db
+	 */
+	private $db;
 
 	/**
 	 * @throws Exception
@@ -13,12 +40,14 @@ class Tx_Purge_Finder_Realurl extends Tx_Purge_Finder_Abstract {
 	public function __construct() {
 		parent::__construct();
 
+		$this->db = $GLOBALS['TYPO3_DB'];
+
 		// default RealUrl
 		$this->cacheLookupTables = array('tx_realurl_pathcache:page_id:rootpage_id:pagepath');
 
 		if (!$this->conf['forceDefaultCacheLookupTables']) {
 			// advanced RealUrl
-			if (in_array('tx_realurl_cachehistory', array_keys($GLOBALS['TYPO3_DB']->admin_get_tables()))) {
+			if (in_array('tx_realurl_cachehistory', array_keys($this->db->admin_get_tables()))) {
 				$this->cacheLookupTables = array(
 					'tx_realurl_cache:pageid:rootpid:path',
 					'tx_realurl_cachehistory:pageid:rootpid:path'
@@ -32,28 +61,25 @@ class Tx_Purge_Finder_Realurl extends Tx_Purge_Finder_Abstract {
 	}
 
 	/**
-	 * @param int $uid
+	 * @param  int $uid
 	 * @return array
 	 */
 	public function getURLFromPageID($uid) {
 		$urls = array();
-
 		$uidList = $this->expandUid($uid);
+
 		foreach ($this->cacheLookupTables as $tableCfg) {
 			list($table,$pageId,$rootPid,$pathKey) = explode(':', $tableCfg);
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, $pageId . ' IN ('. implode(',', $uidList) . ')');
-			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$res = $this->db->exec_SELECTquery('*', $table, $pageId . ' IN ('. implode(',', $uidList) . ')');
+			while ($row = $this->db->sql_fetch_assoc($res)) {
 				foreach ($this->getDomainsFromRootpageId($row[$rootPid]) as $domain) {
 					$realDomains = $this->getDomainsFromRootpageId($row[$rootPid], FALSE);
-					$pagePath = $this->prefixLanguage($row['languageid'], $realDomains, $row[$pathKey] . '/');
-					$pagePath = $this->suffixHtml($realDomains, $pagePath);
-					$urls[] = array(
-						'domain'	=> $domain,
-						'path' 		=> $pagePath,
-					);
+					$pagePath = $this->prefixLanguage($row['languageid'], $realDomains, $row[$pathKey]) . '.*';
+					$urls[] = array('domain' => $domain, 'path' => $pagePath);
 				}
 			}
 		}
+
 		return $urls;
 	}
 
