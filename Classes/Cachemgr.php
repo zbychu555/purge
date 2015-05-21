@@ -178,6 +178,7 @@ class Tx_Purge_Cachemgr {
 	 */
 	public function addClearQueuePaths($paths) {
 		$this->clearQueue = array_merge($this->clearQueue, $paths);
+		$this->clearQueue = array_unique($this->clearQueue);
 	}
 
 	/**
