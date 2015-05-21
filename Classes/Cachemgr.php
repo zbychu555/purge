@@ -59,6 +59,8 @@ class Tx_Purge_Cachemgr {
 				if ($selectResult === -1) {
 					// error
 					t3lib_div::devLog('curl_multi_select error', 'purge', t3lib_div::SYSLOG_SEVERITY_ERROR);
+
+					usleep(100);
 				}
 
 				if ($selectResult === 0) {
@@ -66,14 +68,14 @@ class Tx_Purge_Cachemgr {
 					t3lib_div::devLog('curl_multi_select timeout', 'purge', t3lib_div::SYSLOG_SEVERITY_WARNING);
 				}
 
+				do {
+					$status = curl_multi_exec($mh, $active);
+					t3lib_div::devLog('status activity', 'purge', t3lib_div::SYSLOG_SEVERITY_INFO, array($status));
+				} while ($status == CURLM_CALL_MULTI_PERFORM);
+
 				if ($selectResult > 0) {
 					// activity detected
 					t3lib_div::devLog('curl_multi_select activity', 'purge', t3lib_div::SYSLOG_SEVERITY_INFO);
-
-					do {
-						$status = curl_multi_exec($mh, $active);
-						t3lib_div::devLog('status activity', 'purge', t3lib_div::SYSLOG_SEVERITY_INFO, array($status));
-					} while ($status == CURLM_CALL_MULTI_PERFORM);
 
 					$mhinfo = curl_multi_info_read($mh);
 					if ($mhinfo !== false) {
