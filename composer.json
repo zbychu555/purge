@@ -1,0 +1,23 @@
+{
+  "name": "macopedia/purge",
+  "type": "typo3-cms-extension",
+  "description": "Fork from https://github.com/TYPO3-extensions/purge",
+  "homepage": "https://github.com/zbychu555/purge",
+  "license": ["GPL-2.0+"],
+  "keywords": ["TYPO3 CMS", "Purge"],
+  "support": {
+    "issues": "https://github.com/zbychu555/purge"
+  },
+  "require": {
+    "typo3/cms-core": "^6.2.14 || ^7.6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Macopedia\\Purge\\": "Classes/"
+    }
+  },
+  "replace": {
+    "my_ext_key": "self.version",
+    "typo3-ter/my-ext-key": "self.version"
+  }
+}
