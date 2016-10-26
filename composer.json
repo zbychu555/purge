@@ -17,7 +17,7 @@
     }
   },
   "replace": {
-    "my_ext_key": "self.version",
-    "typo3-ter/my-ext-key": "self.version"
+    "purge": "self.version",
+    "typo3-ter/purge": "self.version"
   }
 }
